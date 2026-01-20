@@ -3,7 +3,6 @@ module github.com/NikitaTumanov/go-final-project
 go 1.25.4
 
 require (
-	github.com/go-chi/chi/v5 v5.2.4
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/stretchr/testify v1.11.1
 	modernc.org/sqlite v1.44.2

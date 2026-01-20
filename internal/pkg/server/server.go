@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/NikitaTumanov/go-final-project/internal/pkg/api"
 )
 
 const (
@@ -15,10 +15,8 @@ const (
 	webDir      = "./web"
 )
 
-func StartServer() {
-	router := chi.NewRouter()
-
-	router.Handle("/*", http.FileServer(http.Dir(webDir)))
+func Run() {
+	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	port := defaultPort
 
@@ -32,8 +30,10 @@ func StartServer() {
 		}
 	}
 
+	api.Init()
+
 	addr := fmt.Sprintf(":%d", port)
 
 	log.Println("Server started on port", addr)
-	http.ListenAndServe(addr, router)
+	http.ListenAndServe(addr, nil)
 }
