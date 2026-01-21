@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -203,4 +204,36 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 	}
 
 	return startDate.Format(dateFormat), nil
+}
+
+func nextDayHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, errMethodNotAllowed.Error(), http.StatusMethodNotAllowed)
+		return
+	}
+
+	nowStr := r.FormValue("now")
+	dateStr := r.FormValue("date")
+	repeat := r.FormValue("repeat")
+
+	if nowStr == "" || dateStr == "" || repeat == "" {
+		http.Error(w, errMissingQueryParameters.Error(), http.StatusBadRequest)
+		return
+	}
+
+	now, err := time.Parse(dateFormat, nowStr)
+	if err != nil {
+		http.Error(w, errInvalidNowFormat.Error(), http.StatusBadRequest)
+		return
+	}
+
+	next, err := nextDate(now, dateStr, repeat)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(next))
 }
