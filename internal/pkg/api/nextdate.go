@@ -52,7 +52,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 
 	startDate, err := time.Parse(dateFormat, dstart)
 	if err != nil {
-		return "", err
+		return "", errors.New("start date parse error")
 	}
 
 	fixedStartDate := startDate
