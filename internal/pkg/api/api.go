@@ -24,10 +24,10 @@ func Init() {
 
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	/*case http.MethodGet:
+	case http.MethodGet:
 		getTaskByIDHandler(w, r)
 	case http.MethodPut:
-		changeTaskByIDHandler(w, r)*/
+		changeTaskByIDHandler(w, r)
 	case http.MethodPost:
 		addTaskHandler(w, r)
 	default:

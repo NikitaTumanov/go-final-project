@@ -10,10 +10,6 @@ import (
 	"github.com/NikitaTumanov/go-final-project/internal/pkg/model"
 )
 
-type tasksResponse struct {
-	Tasks []model.Task `json:"tasks"`
-}
-
 func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -25,7 +21,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 			tasks, err = db.TasksByDate(search, rowsLimit)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				_ = json.NewEncoder(w).Encode(model.AddTaskResponse{
+				_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
 					Error: errors.New("error in select tasks from DB").Error(),
 				})
 				return
@@ -34,7 +30,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 			tasks, err = db.TasksByTitleOrComment(search, rowsLimit)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				_ = json.NewEncoder(w).Encode(model.AddTaskResponse{
+				_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
 					Error: errors.New("error in select tasks from DB").Error(),
 				})
 				return
@@ -45,7 +41,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 		tasks, err = db.Tasks(rowsLimit)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_ = json.NewEncoder(w).Encode(model.AddTaskResponse{
+			_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
 				Error: errors.New("error in select tasks from DB").Error(),
 			})
 			return
@@ -53,7 +49,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(tasksResponse{
+	_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
 		Tasks: tasks,
 	})
 }

@@ -19,3 +19,21 @@ type AddTaskResponse struct {
 	ID    string `json:"id,omitempty"`
 	Error string `json:"error,omitempty"`
 }
+
+type GetTasksResponse struct {
+	Tasks []Task `json:"tasks,omitempty"`
+	Error string `json:"error,omitempty"`
+}
+
+type GetTaskByIDResponse struct {
+	ID      string `json:"id,omitempty"`
+	Date    string `json:"date,omitempty"`
+	Title   string `json:"title,omitempty"`
+	Comment string `json:"comment,omitempty"`
+	Repeate string `json:"repeat,omitempty"`
+	Error   string `json:"error,omitempty"`
+}
+
+type UpdateTaskByIDResponse struct {
+	Error string `json:"error,omitempty"`
+}

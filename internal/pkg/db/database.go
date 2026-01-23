@@ -116,9 +116,9 @@ func TasksByTitleOrComment(search string, limit int) ([]model.Task, error) {
 	return parseTasks(rows)
 }
 
-func TasksByDate(search string, limit int) ([]model.Task, error) {
-	rows, err := DB.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = :search LIMIT :limit",
-		sql.Named("search", search),
+func TasksByDate(date string, limit int) ([]model.Task, error) {
+	rows, err := DB.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = :date LIMIT :limit",
+		sql.Named("date", date),
 		sql.Named("limit", limit))
 	if err != nil {
 		return nil, err
@@ -126,4 +126,26 @@ func TasksByDate(search string, limit int) ([]model.Task, error) {
 	defer rows.Close()
 
 	return parseTasks(rows)
+}
+
+func TasksByID(id string) (model.Task, error) {
+	row := DB.QueryRow("SELECT id, date, title, comment, repeat FROM scheduler WHERE id = :id",
+		sql.Named("id", id))
+
+	var task model.Task
+	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeate)
+	if err != nil {
+		return model.Task{}, err
+	}
+
+	return task, nil
+}
+
+func ChangeTaskByID(id, date, title, comment, repeate string) (sql.Result, error) {
+	return DB.Exec("UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeate = :repeate WHERE id = :id",
+		sql.Named("id", id),
+		sql.Named("date", date),
+		sql.Named("title", title),
+		sql.Named("comment", comment),
+		sql.Named("repeate", repeate))
 }
