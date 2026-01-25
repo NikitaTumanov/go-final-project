@@ -13,7 +13,7 @@ import (
 func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	var tasks []model.Task
+	tasks := make([]model.Task, 0)
 	search := r.URL.Query().Get("search")
 	if search != "" {
 		if date, err := time.Parse("02.01.2006", search); err == nil {

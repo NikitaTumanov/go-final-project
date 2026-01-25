@@ -21,7 +21,7 @@ type AddTaskResponse struct {
 }
 
 type GetTasksResponse struct {
-	Tasks []Task `json:"tasks,omitempty"`
+	Tasks []Task `json:"tasks"`
 	Error string `json:"error,omitempty"`
 }
 
