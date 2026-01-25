@@ -20,6 +20,7 @@ func Init() {
 	http.HandleFunc("/api/nextdate", nextDayHandler)
 	http.HandleFunc("/api/task", taskHandler)
 	http.HandleFunc("/api/tasks", tasksHandler)
+	http.HandleFunc("/api/task/done", doneTaskHandler)
 }
 
 func taskHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +31,8 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		changeTaskByIDHandler(w, r)
 	case http.MethodPost:
 		addTaskHandler(w, r)
+	case http.MethodDelete:
+		deleteTaskHandler(w, r)
 	default:
 		http.Error(w, errMethodNotAllowed.Error(), http.StatusMethodNotAllowed)
 	}

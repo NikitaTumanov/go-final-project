@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/NikitaTumanov/go-final-project/internal/pkg/db"
@@ -36,7 +35,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var date time.Time
-	if strings.ReplaceAll(addTaskRequest.DateStr, " ", "") == "" {
+	if addTaskRequest.DateStr == "" {
 		addTaskRequest.DateStr = time.Now().Format(dateFormat)
 	} else {
 		date, err = time.Parse(dateFormat, addTaskRequest.DateStr)
@@ -136,6 +135,22 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if task.ID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			Error: errors.New("ID is empty").Error(),
+		})
+		return
+	}
+
+	if _, err := strconv.Atoi(task.ID); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
+			Error: errors.New("ID is incorrect").Error(),
+		})
+		return
+	}
+
 	if task.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
@@ -145,7 +160,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var date time.Time
-	if strings.ReplaceAll(task.Date, " ", "") == "" {
+	if task.Date == "" {
 		task.Date = time.Now().Format(dateFormat)
 	} else {
 		date, err = time.Parse(dateFormat, task.Date)
@@ -174,11 +189,61 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = db.ChangeTaskByID(task.ID, task.Date, task.Title, task.Comment, task.Repeate)
+	res, err := db.ChangeTaskByID(task.ID, task.Date, task.Title, task.Comment, task.Repeate)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
 			Error: errors.New("error in update task to DB").Error(),
+		})
+		return
+	}
+
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			Error: errors.New("error in update task to DB").Error(),
+		})
+		return
+	}
+
+	if affectedRows == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			Error: errors.New("no tasks with this id").Error(),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{})
+}
+
+func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			Error: errors.New("ID is empty").Error(),
+		})
+		return
+	}
+
+	if _, err := strconv.Atoi(idStr); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			Error: errors.New("ID is incorrect").Error(),
+		})
+		return
+	}
+
+	_, err := db.DeleteTaskByID(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			Error: errors.New("error in delete task from DB").Error(),
 		})
 		return
 	}

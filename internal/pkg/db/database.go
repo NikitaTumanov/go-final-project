@@ -141,11 +141,16 @@ func TasksByID(id string) (model.Task, error) {
 	return task, nil
 }
 
-func ChangeTaskByID(id, date, title, comment, repeate string) (sql.Result, error) {
-	return DB.Exec("UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeate = :repeate WHERE id = :id",
+func ChangeTaskByID(id, date, title, comment, repeat string) (sql.Result, error) {
+	return DB.Exec("UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id",
 		sql.Named("id", id),
 		sql.Named("date", date),
 		sql.Named("title", title),
 		sql.Named("comment", comment),
-		sql.Named("repeate", repeate))
+		sql.Named("repeat", repeat))
+}
+
+func DeleteTaskByID(id string) (sql.Result, error) {
+	return DB.Exec("DELETE FROM scheduler WHERE id = :id",
+		sql.Named("id", id))
 }
