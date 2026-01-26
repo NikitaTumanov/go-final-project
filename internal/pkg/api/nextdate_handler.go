@@ -31,14 +31,6 @@ func matchDays(day time.Time, rule monthDaysRule) bool {
 	return false
 }
 
-func afterNow(date, now time.Time) bool {
-	if date.Sub(now) > 0 {
-		return true
-	}
-
-	return false
-}
-
 func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 	repeatElements := strings.Fields(repeat)
 	if len(repeatElements) == 0 {
@@ -63,7 +55,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 			return "", errIncorrectRepeat
 		}
 
-		for !afterNow(startDate, now) || !afterNow(startDate, fixedStartDate) {
+		for !startDate.After(now) || !startDate.After(fixedStartDate) {
 			startDate = startDate.AddDate(0, 0, days)
 		}
 
@@ -72,7 +64,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 			return "", errIncorrectRepeat
 		}
 
-		for !afterNow(startDate, now) || !afterNow(startDate, fixedStartDate) {
+		for !startDate.After(now) || !startDate.After(fixedStartDate) {
 			startDate = startDate.AddDate(1, 0, 0)
 		}
 
@@ -98,7 +90,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 			weekDay[day] = true
 		}
 
-		for !afterNow(startDate, now) || !afterNow(startDate, fixedStartDate) {
+		for !startDate.After(now) || !startDate.After(fixedStartDate) {
 			startDate = startDate.AddDate(0, 0, 1)
 		}
 
@@ -175,7 +167,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 			}
 		}
 
-		for !afterNow(startDate, now) || !afterNow(startDate, fixedStartDate) {
+		for !startDate.After(now) || !startDate.After(fixedStartDate) {
 			startDate = startDate.AddDate(0, 0, 1)
 		}
 
@@ -206,9 +198,9 @@ func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nowStr := r.FormValue("now")
-	dateStr := r.FormValue("date")
-	repeat := r.FormValue("repeat")
+	nowStr := r.URL.Query().Get("now")
+	dateStr := r.URL.Query().Get("date")
+	repeat := r.URL.Query().Get("repeat")
 
 	if nowStr == "" || dateStr == "" || repeat == "" {
 		http.Error(w, errMissingQueryParameters.Error(), http.StatusBadRequest)

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -19,6 +20,14 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 			search = date.Format(dateFormat)
 			tasks, err = db.TasksByDate(search, rowsLimit)
 			if err != nil {
+				if err == sql.ErrNoRows {
+					w.WriteHeader(http.StatusBadRequest)
+					_ = json.NewEncoder(w).Encode(model.ErrorResponse{
+						Error: errDatabaseNoTasks.Error(),
+					})
+					return
+				}
+
 				w.WriteHeader(http.StatusInternalServerError)
 				_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 					Error: errDatabaseSelect.Error(),
@@ -28,6 +37,14 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			tasks, err = db.TasksByTitleOrComment(search, rowsLimit)
 			if err != nil {
+				if err == sql.ErrNoRows {
+					w.WriteHeader(http.StatusBadRequest)
+					_ = json.NewEncoder(w).Encode(model.ErrorResponse{
+						Error: errDatabaseNoTasks.Error(),
+					})
+					return
+				}
+
 				w.WriteHeader(http.StatusInternalServerError)
 				_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 					Error: errDatabaseSelect.Error(),
@@ -39,6 +56,14 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 		var err error
 		tasks, err = db.Tasks(rowsLimit)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusBadRequest)
+				_ = json.NewEncoder(w).Encode(model.ErrorResponse{
+					Error: errDatabaseNoTasks.Error(),
+				})
+				return
+			}
+
 			w.WriteHeader(http.StatusInternalServerError)
 			_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 				Error: errDatabaseSelect.Error(),

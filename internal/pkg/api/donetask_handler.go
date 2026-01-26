@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -32,6 +33,14 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	task, err := db.TaskByID(idStr)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(model.ErrorResponse{
+				Error: errDatabaseNoTasks.Error(),
+			})
+			return
+		}
+
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 			Error: errDatabaseSelect.Error(),
@@ -42,6 +51,14 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if task.Repeate == "" {
 		_, err = db.DeleteTaskByID(idStr)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusBadRequest)
+				_ = json.NewEncoder(w).Encode(model.ErrorResponse{
+					Error: errDatabaseNoTasks.Error(),
+				})
+				return
+			}
+
 			w.WriteHeader(http.StatusInternalServerError)
 			_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 				Error: errDatabaseDelete.Error(),
