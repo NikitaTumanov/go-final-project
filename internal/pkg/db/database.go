@@ -24,16 +24,6 @@ func createDir(dbFile string) error {
 	return os.MkdirAll(dir, 0755)
 }
 
-func checkDBFile(dbFile string) bool {
-	install := false
-	_, err := os.Stat(dbFile)
-	if err != nil {
-		install = true
-	}
-
-	return install
-}
-
 func checkDBIsEmpty(db *sql.DB) (bool, error) {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'").Scan(&count)
