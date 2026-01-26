@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"os"
+	"path/filepath"
 
 	_ "modernc.org/sqlite"
 )
@@ -17,6 +18,11 @@ const schema = `CREATE TABLE IF NOT EXISTS scheduler (
     repeat TEXT CHECK (length(repeat) <= 128)
 );
 CREATE INDEX IF NOT EXISTS idx_scheduler_date ON scheduler(date);`
+
+func createDir(dbFile string) error {
+	dir := filepath.Dir(dbFile)
+	return os.MkdirAll(dir, 0755)
+}
 
 func checkDBFile(dbFile string) bool {
 	install := false
@@ -41,9 +47,11 @@ func Init(dbFile string) error {
 		dbFile = envFile
 	}
 
-	isNotExists := checkDBFile(dbFile)
+	err := createDir(dbFile)
+	if err != nil {
+		return err
+	}
 
-	var err error
 	DB, err = sql.Open("sqlite", dbFile)
 	if err != nil {
 		return err
@@ -54,7 +62,7 @@ func Init(dbFile string) error {
 		return err
 	}
 
-	if isNotExists || isEmpty {
+	if isEmpty {
 		_, err := DB.Exec(schema)
 		if err != nil {
 			return err
