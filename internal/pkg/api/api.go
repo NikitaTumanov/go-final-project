@@ -13,7 +13,23 @@ const (
 var (
 	errMethodNotAllowed       = errors.New("method not allowed")
 	errMissingQueryParameters = errors.New("missing query parameters")
-	errInvalidNowFormat       = errors.New("invalid now format")
+	errIncorrectJSON          = errors.New("incorrect JSON")
+
+	errEmptyId            = errors.New("id is empty")
+	errIncorrectId        = errors.New("id is incorrect")
+	errEmptyTitle         = errors.New("title is empty")
+	errIncorrectNowFormat = errors.New("invalid now format")
+	errIncorrectRepeat    = errors.New("incorrect repeat format")
+	errIncorrectDate      = errors.New("date is incorrect")
+	errParseStartDate     = errors.New("start date parse error")
+
+	errNextDateNotFound = errors.New("next date not found")
+
+	errDatabaseSelect  = errors.New("error in select task from DB")
+	errDatabaseInsert  = errors.New("error in insert task to DB")
+	errDatabaseUpdate  = errors.New("error in update task to DB")
+	errDatabaseDelete  = errors.New("error in delete task from DB")
+	errDatabaseNoTasks = errors.New("no tasks with this id")
 )
 
 func Init() {

@@ -1,16 +1,10 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-)
-
-var (
-	errIncorrectRepeat  = errors.New("incorrect repeat format")
-	errNextDateNotFound = errors.New("next date not found")
 )
 
 type monthDaysRule struct {
@@ -53,7 +47,7 @@ func nextDate(now time.Time, dstart string, repeat string) (string, error) {
 
 	startDate, err := time.Parse(dateFormat, dstart)
 	if err != nil {
-		return "", errors.New("start date parse error")
+		return "", errParseStartDate
 	}
 
 	fixedStartDate := startDate
@@ -223,7 +217,7 @@ func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 
 	now, err := time.Parse(dateFormat, nowStr)
 	if err != nil {
-		http.Error(w, errInvalidNowFormat.Error(), http.StatusBadRequest)
+		http.Error(w, errIncorrectNowFormat.Error(), http.StatusBadRequest)
 		return
 	}
 

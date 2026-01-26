@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,7 +20,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.AddTaskResponse{
-			Error: errors.New("incorrect JSON").Error(),
+			Error: errIncorrectJSON.Error(),
 		})
 		return
 	}
@@ -29,7 +28,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if addTaskRequest.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.AddTaskResponse{
-			Error: errors.New("title is required").Error(),
+			Error: errEmptyTitle.Error(),
 		})
 		return
 	}
@@ -42,7 +41,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_ = json.NewEncoder(w).Encode(model.AddTaskResponse{
-				Error: errors.New("date is incorrect").Error(),
+				Error: errIncorrectDate.Error(),
 			})
 			return
 		}
@@ -68,7 +67,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(model.AddTaskResponse{
-			Error: errors.New("error in insert task to DB").Error(),
+			Error: errDatabaseInsert.Error(),
 		})
 		return
 	}
@@ -88,7 +87,7 @@ func getTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if idStr == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
-			Error: errors.New("ID is empty").Error(),
+			Error: errEmptyId.Error(),
 		})
 		return
 	}
@@ -96,16 +95,16 @@ func getTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if _, err := strconv.Atoi(idStr); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
-			Error: errors.New("ID is incorrect").Error(),
+			Error: errIncorrectId.Error(),
 		})
 		return
 	}
 
-	task, err := db.TasksByID(idStr)
+	task, err := db.TaskByID(idStr)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
-			Error: errors.New("error in select task from DB").Error(),
+			Error: errDatabaseSelect.Error(),
 		})
 		return
 	}
@@ -130,7 +129,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("incorrect JSON").Error(),
+			Error: errIncorrectJSON.Error(),
 		})
 		return
 	}
@@ -138,7 +137,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if task.ID == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("ID is empty").Error(),
+			Error: errEmptyId.Error(),
 		})
 		return
 	}
@@ -146,7 +145,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if _, err := strconv.Atoi(task.ID); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
-			Error: errors.New("ID is incorrect").Error(),
+			Error: errEmptyId.Error(),
 		})
 		return
 	}
@@ -154,7 +153,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if task.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("title is required").Error(),
+			Error: errEmptyTitle.Error(),
 		})
 		return
 	}
@@ -167,7 +166,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-				Error: errors.New("date is incorrect").Error(),
+				Error: errIncorrectDate.Error(),
 			})
 			return
 		}
@@ -193,7 +192,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("error in update task to DB").Error(),
+			Error: errDatabaseUpdate.Error(),
 		})
 		return
 	}
@@ -202,7 +201,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("error in update task to DB").Error(),
+			Error: errDatabaseUpdate.Error(),
 		})
 		return
 	}
@@ -210,7 +209,7 @@ func changeTaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if affectedRows == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("no tasks with this id").Error(),
+			Error: errDatabaseNoTasks.Error(),
 		})
 		return
 	}
@@ -226,7 +225,7 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if idStr == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("ID is empty").Error(),
+			Error: errEmptyId.Error(),
 		})
 		return
 	}
@@ -234,7 +233,7 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if _, err := strconv.Atoi(idStr); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("ID is incorrect").Error(),
+			Error: errIncorrectId.Error(),
 		})
 		return
 	}
@@ -243,7 +242,7 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
-			Error: errors.New("error in delete task from DB").Error(),
+			Error: errDatabaseDelete.Error(),
 		})
 		return
 	}

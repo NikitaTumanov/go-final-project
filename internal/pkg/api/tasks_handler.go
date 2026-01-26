@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"time"
 
@@ -22,7 +21,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
-					Error: errors.New("error in select tasks from DB").Error(),
+					Error: errDatabaseSelect.Error(),
 				})
 				return
 			}
@@ -31,7 +30,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
-					Error: errors.New("error in select tasks from DB").Error(),
+					Error: errDatabaseSelect.Error(),
 				})
 				return
 			}
@@ -42,7 +41,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
-				Error: errors.New("error in select tasks from DB").Error(),
+				Error: errDatabaseSelect.Error(),
 			})
 			return
 		}
