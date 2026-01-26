@@ -20,7 +20,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 			tasks, err = db.TasksByDate(search, rowsLimit)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
+				_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 					Error: errDatabaseSelect.Error(),
 				})
 				return
@@ -29,7 +29,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 			tasks, err = db.TasksByTitleOrComment(search, rowsLimit)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
+				_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 					Error: errDatabaseSelect.Error(),
 				})
 				return
@@ -40,7 +40,7 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 		tasks, err = db.Tasks(rowsLimit)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_ = json.NewEncoder(w).Encode(model.GetTasksResponse{
+			_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 				Error: errDatabaseSelect.Error(),
 			})
 			return

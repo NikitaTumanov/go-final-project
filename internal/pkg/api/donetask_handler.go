@@ -16,7 +16,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
+		_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 			Error: errEmptyId.Error(),
 		})
 		return
@@ -24,7 +24,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := strconv.Atoi(idStr); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
+		_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 			Error: errIncorrectId.Error(),
 		})
 		return
@@ -33,7 +33,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	task, err := db.TaskByID(idStr)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		_ = json.NewEncoder(w).Encode(model.GetTaskByIDResponse{
+		_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 			Error: errDatabaseSelect.Error(),
 		})
 		return
@@ -43,7 +43,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		_, err = db.DeleteTaskByID(idStr)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 				Error: errDatabaseDelete.Error(),
 			})
 			return
@@ -52,7 +52,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		task.Date, err = nextDate(time.Now(), task.Date, task.Repeate)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 				Error: err.Error(),
 			})
 			return
@@ -61,7 +61,7 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		_, err = db.ChangeTaskByID(task.ID, task.Date, task.Title, task.Comment, task.Repeate)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{
+			_ = json.NewEncoder(w).Encode(model.ErrorResponse{
 				Error: errDatabaseUpdate.Error(),
 			})
 			return
@@ -69,5 +69,5 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(model.UpdateTaskByIDResponse{})
+	_ = json.NewEncoder(w).Encode(model.ErrorResponse{})
 }
