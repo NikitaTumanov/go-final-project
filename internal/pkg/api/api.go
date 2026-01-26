@@ -30,13 +30,18 @@ var (
 	errDatabaseUpdate  = errors.New("error in update task to DB")
 	errDatabaseDelete  = errors.New("error in delete task from DB")
 	errDatabaseNoTasks = errors.New("no tasks with this id")
+
+	errWrongPasswordJSON = errors.New("wrong password JSON")
+	errWrongPassword     = errors.New("wrong password")
+	errCreateJWT         = errors.New("can not create JWT")
 )
 
 func Init() {
-	http.HandleFunc("/api/nextdate", nextDayHandler)
-	http.HandleFunc("/api/task", taskHandler)
-	http.HandleFunc("/api/tasks", tasksHandler)
-	http.HandleFunc("/api/task/done", doneTaskHandler)
+	http.HandleFunc("/api/nextdate", auth(nextDayHandler))
+	http.HandleFunc("/api/task", auth(taskHandler))
+	http.HandleFunc("/api/tasks", auth(tasksHandler))
+	http.HandleFunc("/api/task/done", auth(doneTaskHandler))
+	http.HandleFunc("/api/signin", signInHandler)
 }
 
 func taskHandler(w http.ResponseWriter, r *http.Request) {

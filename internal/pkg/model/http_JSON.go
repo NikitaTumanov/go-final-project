@@ -19,6 +19,14 @@ type AddTaskResponse struct {
 	ID string `json:"id"`
 }
 
+type SignInRequest struct {
+	Password string `json:"password"`
+}
+
+type SignInResponse struct {
+	Token string `json:"token"`
+}
+
 type GetTasksResponse struct {
 	Tasks []Task `json:"tasks"`
 }
