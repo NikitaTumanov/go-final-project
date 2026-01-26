@@ -24,7 +24,7 @@ COPY main.go .
 
 ENV TODO_PORT=8080
 ENV TODO_PASSWORD=12345
-ENV TODO_DBFILE=/data/scheduler.db
+ENV TODO_DBFILE=/app/data/scheduler.db
 
 RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o application main.go
 
